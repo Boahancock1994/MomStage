@@ -1,0 +1,93 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens — โทนธรรมชาติ: เขียวเสจ + ครีม + ส้มอิฐ
+ * ใช้ผ่านคลาส Tailwind เช่น bg-primary, text-ink, border-line
+ * คู่สีตัวอักษร/พื้นหลังทุกคู่ผ่านค่า contrast ≥ 4.5:1 (WCAG AA)
+ */
+@theme {
+  --font-sans: 'Noto Sans Thai', ui-sans-serif, system-ui, sans-serif;
+
+  /*
+   * โทนอบอุ่น: ชมพูพีช + เขียวเซจ บนพื้นครีม ไม่ใช้สีสดจ้า
+   * สีพีช #F8B4A8 ใช้เป็น "พื้น" (ปุ่ม/การ์ดเด่น) คู่กับตัวหนังสือเข้ม (6.5:1)
+   * ส่วนตัวหนังสือ/ลิงก์/ขอบที่ต้องอ่านออกใช้ primary-strong #944B41 (≥ 5:1 บนทุกพื้น)
+   * ทุกคู่ตัวอักษร–พื้นผ่าน WCAG AA (≥ 4.5:1)
+   */
+  --color-canvas: #fff8f3;
+  --color-surface: #ffffff;
+  --color-surface-muted: #fbefe8;
+  --color-line: #f1e1d8;
+
+  --color-ink: #3d3a3a;
+  --color-ink-muted: #6b6464;
+
+  --color-primary: #f8b4a8;
+  --color-primary-hover: #f49e8f;
+  --color-primary-soft: #fde8e3;
+  --color-primary-strong: #944b41;
+  --color-on-primary: #3d3a3a;
+  --color-pink: #c97a6d;
+
+  --color-accent: #a8c5a0;
+  --color-accent-soft: #edf4ea;
+  --color-accent-strong: #4e6e47;
+
+  /* สีความหมาย: ผ่าน/สมวัย = เขียว · ระวัง = ส้มอำพัน · อันตราย = แดงอิฐ (โทนนุ่ม ไม่สดจ้า) */
+  --color-success: #3f6b39;
+  --color-success-soft: #e6f0e2;
+
+  --color-warning: #8a5300;
+  --color-warning-soft: #fbf1de;
+  --color-warning-line: #e2b86a;
+
+  --color-danger: #a8433b;
+  --color-danger-soft: #fcebe8;
+  --color-on-danger: #ffffff;
+
+  /* สีกราฟ 3 ชุด — ผ่าน dataviz validate_palette (CVD/contrast) บนพื้นขาว */
+  --color-chart-1: #2b84b8;
+  --color-chart-2: #d9702f;
+  --color-chart-3: #8a6bd1;
+
+  --radius-card: 1rem;
+  --shadow-card: 0 1px 2px rgb(61 58 58 / 0.04), 0 4px 14px rgb(61 58 58 / 0.05);
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+    line-height: 1.6;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  label {
+    touch-action: manipulation;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary-strong;
+  }
+
+  /* ปฏิทินของ input type=date ให้กดง่ายบนมือถือ */
+  input[type='date']::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
