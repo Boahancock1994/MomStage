@@ -14,6 +14,7 @@ import NamePage from './NamePage'
 import MilestonesHistoryPage from './MilestonesHistoryPage'
 import MilestonesPage from './MilestonesPage'
 import VaccinePage from './VaccinePage'
+import { createDemoChildren } from '../data/demo'
 import { useAppStore } from '../store/useAppStore'
 
 function Dump({ path }: { path: string }) {
@@ -50,7 +51,10 @@ it('หน้าหลักทุกหน้า render ได้โดยไ�
     renderToString(<Grab />)
     return box.store!
   }
-  grab().loadDemo()
+  for (const demo of createDemoChildren(new Date())) {
+    const s = grab()
+    s.updateChild(s.addChild(demo), demo)
+  }
   const store = grab()
   for (const child of store.children) {
     store.setActiveChild(child.id)

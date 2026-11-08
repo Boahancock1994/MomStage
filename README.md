@@ -65,7 +65,7 @@ src/
 │   ├── nursingRoomsSeed.ts  จุดตั้งต้นห้องให้นม 19 จุด (ห้าง โรงพยาบาล สนามบิน ในกรุงเทพฯ)
 │   ├── names.ts          ชื่อไทย 162 ชื่อ (ชาย 82 / หญิง 80) พร้อมความหมาย
 │   ├── whoGrowth.ts      ค่า LMS รายเดือน WHO Child Growth Standards (น้ำหนัก/ส่วนสูง ชาย/หญิง 0–36 เดือน)
-│   └── demo.ts           ข้อมูลตัวอย่าง 2 คนสำหรับปุ่ม "ลองดูตัวอย่าง"
+│   └── demo.ts           ข้อมูลตัวอย่าง 2 คน ใช้เฉพาะในการทดสอบ
 ├── lib/                  ตรรกะล้วน ๆ ไม่มี UI — ทดสอบได้
 │   ├── age.ts            ★ สูตรคำนวณอายุครรภ์ / อายุลูก
 │   ├── age.test.ts       unit test ของ age.ts
@@ -250,7 +250,7 @@ src/
 ### 15. การเก็บข้อมูล — `src/store/useAppStore.ts`
 
 ทุกหน้าเรียกข้อมูลผ่าน `useAppStore()` ตัวเดียว ได้ `children`, `activeChild` และคำสั่ง
-`addChild`, `updateChild`, `removeChild`, `setActiveChild`, `setVaccineDate`, `toggleChecklistItem`, `addQuizResult`, `addGrowthEntry`, `removeGrowthEntry`, `toggleCare`, `removeCareEvent`, `updateCalcSettings`, `toggleFavoriteName`, `loadDemo`, `clearAll`
+`addChild`, `updateChild`, `removeChild`, `setActiveChild`, `setVaccineDate`, `toggleChecklistItem`, `addQuizResult`, `addGrowthEntry`, `removeGrowthEntry`, `toggleCare`, `removeCareEvent`, `updateCalcSettings`, `toggleFavoriteName`, `clearAll`
 ข้อมูลเก็บใน localStorage key `momstage:v1` — ถ้าจะย้ายไป Firebase แก้แค่ฟังก์ชัน `loadState` / `persist` ในไฟล์นี้
 
 ## ข้อมูลที่ยังรอตรวจสอบ (`verified: false`)

@@ -2,15 +2,15 @@
  * หน้าแรกสำหรับผู้ใช้ใหม่: กรอกข้อมูลลูกครั้งเดียว แล้วแอปคำนวณทุกอย่างให้
  * ใช้ซ้ำสำหรับ "เพิ่มลูกคนถัดไป" ผ่าน /onboarding?add=1
  */
-import { ArrowLeftIcon, SparkleIcon } from '../components/icons'
+import { ArrowLeftIcon } from '../components/icons'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { ChildForm } from '../components/ChildForm'
 import { Logo } from '../components/Logo'
-import { Button, Card } from '../components/ui'
+import { Card } from '../components/ui'
 import { useAppStore } from '../store/useAppStore'
 
 export default function OnboardingPage() {
-  const { children, addChild, loadDemo } = useAppStore()
+  const { children, addChild } = useAppStore()
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const isAdding = params.get('add') === '1'
@@ -39,26 +39,6 @@ export default function OnboardingPage() {
           {isAdding ? 'เพิ่มลูกอีกคน' : 'ลูกฉันอายุเท่านี้ ต้องทำอะไร'}
         </h1>
       </header>
-
-      {children.length === 0 && (
-        <div className="mb-5 rounded-[var(--radius-card)] border border-dashed border-primary/40 bg-primary-soft/50 p-4 text-center">
-          <p className="font-medium">อยากลองดูก่อนกรอกข้อมูล?</p>
-          <p className="mt-1 text-sm text-ink-muted">
-            โหลดตัวอย่าง 2 คน: คุณแม่ตั้งครรภ์ 26 สัปดาห์ และลูกอายุ 4 เดือน — สลับดูได้จากเมนูบนหัว
-          </p>
-          <Button
-            variant="secondary"
-            className="mt-3 w-full"
-            onClick={() => {
-              loadDemo()
-              navigate('/', { replace: true })
-            }}
-          >
-            <SparkleIcon size={20} aria-hidden="true" />
-            ลองดูตัวอย่าง
-          </Button>
-        </div>
-      )}
 
       <Card>
         <ChildForm

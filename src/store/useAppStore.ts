@@ -9,7 +9,6 @@
  * และอัปเดตพร้อมกันทันทีเมื่อมีการเปลี่ยนแปลง (รวมถึงเมื่อแก้ข้อมูลจากอีกแท็บ)
  */
 import { useSyncExternalStore } from 'react'
-import { createDemoChildren } from '../data/demo'
 import { DEFAULT_CALC_SETTINGS } from '../lib/babyCalc'
 import type { AppState, CalcSettings, CareType, Child, ExpenseEntry, ExtraExpense, GrowthEntry, QuizResult } from '../types'
 
@@ -233,12 +232,6 @@ const actions = {
       ...s,
       children: s.children.map((c) => (c.id === childId ? { ...c, careLog: c.careLog.filter((e) => e.id !== eventId) } : c)),
     }))
-  },
-
-  /** เพิ่มข้อมูลตัวอย่าง 2 คน (ใช้ตอน onboarding ปุ่ม "ลองดูตัวอย่าง") */
-  loadDemo(today: Date = new Date()) {
-    const demo = createDemoChildren(today).map((c) => normalizeChild({ ...c, id: createId() }))
-    setState((s) => ({ ...s, children: [...s.children, ...demo], activeChildId: demo[0].id }))
   },
 
   /** ล้างข้อมูลทั้งหมดของแอป */

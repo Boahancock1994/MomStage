@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test'
+import { createDemoChildren } from '../src/data/demo'
 
 export const STORAGE_KEY = 'momstage:v1'
 
@@ -9,10 +10,13 @@ export function isoDaysFromToday(days: number): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
-/** โหลดข้อมูลตัวอย่าง 2 คนผ่านปุ่มในหน้า onboarding (น้องมะลิ 4 เดือน = active, เบบี๋ข้าวหอม ตั้งครรภ์) */
+/** ใส่ข้อมูลตัวอย่าง 2 คนลง localStorage โดยตรง (น้องมะลิ 4 เดือน = active, เบบี๋ข้าวหอม ตั้งครรภ์) */
 export async function seedDemo(page: Page) {
+  const children = createDemoChildren(new Date()).map((c, i) => ({ ...c, id: `demo-${i}` }))
+  const state = { version: 1, children, activeChildId: children[0].id }
   await page.goto('/onboarding')
-  await page.getByRole('button', { name: 'ลองดูตัวอย่าง' }).click()
+  await page.evaluate(([key, value]) => localStorage.setItem(key, value), [STORAGE_KEY, JSON.stringify(state)] as const)
+  await page.goto('/')
   await expect(page).toHaveURL('/')
 }
 
