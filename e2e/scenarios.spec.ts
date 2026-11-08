@@ -13,6 +13,7 @@ const ROUTES = [
   '/tools',
   '/tools/sick',
   '/tools/fever-med',
+  '/tools/mom-food',
   '/tools/name',
   '/tools/nursing-map',
   '/tools/calc',

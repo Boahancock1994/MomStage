@@ -19,6 +19,7 @@ const BORN_PAGES: [string, string][] = [
   ['17-nursing-map', '/tools/nursing-map'],
   ['18-name', '/tools/name'],
   ['19-settings', '/settings'],
+  ['20-mom-food', '/tools/mom-food'],
 ]
 
 test.describe.configure({ mode: 'serial' })

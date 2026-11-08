@@ -279,13 +279,10 @@ function NameList({
   onToggle: (name: string) => void
 }) {
   const uid = useId()
-  const [style, setStyle] = useState<'all' | 'modern'>('all')
   const total = NAMES.filter((n) => n.gender === gender).length
   const passing = filterNames(day, gender)
   const q = query.trim()
-  const shown = passing
-    .filter((n) => style === 'all' || n.modern)
-    .filter((n) => !q || n.name.includes(q) || n.meaning.includes(q))
+  const shown = q ? passing.filter((n) => n.name.includes(q) || n.meaning.includes(q)) : passing
 
   return (
     <section aria-labelledby="name-list" className="mt-6">
@@ -294,7 +291,6 @@ function NameList({
       </h2>
       <p className="text-sm text-ink-muted">
         ผ่าน {passing.length} จาก {total} ชื่อ · ชื่อที่มีอักษรเดชหรือศรีขึ้นก่อน
-        {style === 'modern' && ` · แสดงชื่อยุคนี้ ${shown.length} ชื่อ`}
       </p>
       <div className="mt-3 space-y-3">
         <Segmented<NameGender>
@@ -305,16 +301,6 @@ function NameList({
           options={[
             { value: 'girl', label: 'ผู้หญิง' },
             { value: 'boy', label: 'ผู้ชาย' },
-          ]}
-        />
-        <Segmented<'all' | 'modern'>
-          name={`${uid}-style`}
-          legend="แนวชื่อ"
-          value={style}
-          onChange={setStyle}
-          options={[
-            { value: 'all', label: 'ทุกชื่อ' },
-            { value: 'modern', label: 'ชื่อยุคนี้' },
           ]}
         />
         <div className="relative">
@@ -334,7 +320,7 @@ function NameList({
       </div>
 
       {shown.length === 0 ? (
-        <p className="mt-4 text-sm text-ink-muted">ไม่พบชื่อที่ตรงกับเงื่อนไข ลองพิมพ์คำที่สั้นลง หรือเลือกอักษรเริ่มต้นอื่น</p>
+        <p className="mt-4 text-sm text-ink-muted">ไม่พบชื่อที่ตรงกับคำค้น ลองพิมพ์คำที่สั้นลง หรือเลือกอักษรเริ่มต้นอื่น</p>
       ) : (
         <ul className="mt-3 divide-y divide-line rounded-[var(--radius-card)] border border-line bg-surface">
           {shown.map((n) => {

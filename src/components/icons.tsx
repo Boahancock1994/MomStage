@@ -74,6 +74,13 @@ import {
   ArrowLeft,
   type LucideIcon,
   type LucideProps,
+  Apple,
+  Carrot,
+  Wheat,
+  Drumstick,
+  Milk,
+  GlassWater,
+  Utensils,
 } from 'lucide-react'
 import type { ComponentType } from 'react'
 
@@ -163,3 +170,10 @@ export const WarningCircleIcon = wrap(CircleAlert, 'WarningCircleIcon')
 export const WarningIcon = wrap(TriangleAlert, 'WarningIcon')
 export const WarningOctagonIcon = wrap(OctagonAlert, 'WarningOctagonIcon')
 export const XIcon = wrap(X, 'XIcon')
+export const AppleIcon = wrap(Apple, 'AppleIcon')
+export const CarrotIcon = wrap(Carrot, 'CarrotIcon')
+export const WheatIcon = wrap(Wheat, 'WheatIcon')
+export const DrumstickIcon = wrap(Drumstick, 'DrumstickIcon')
+export const MilkIcon = wrap(Milk, 'MilkIcon')
+export const GlassWaterIcon = wrap(GlassWater, 'GlassWaterIcon')
+export const ForkKnifeIcon = wrap(Utensils, 'ForkKnifeIcon')
