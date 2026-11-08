@@ -76,6 +76,8 @@ export interface CalcSettings {
   pricePerCan: string
   gramsPerCan: string
   diaperPrice: string
+  /** จำนวนผ้าอ้อมต่อวัน — ว่าง = ใช้ค่ากลางตามช่วงอายุ */
+  diapersPerDay: string
   extras: ExtraExpense[]
 }
 

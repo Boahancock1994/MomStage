@@ -11,7 +11,6 @@ const BORN_PAGES: [string, string][] = [
   ['09-checklist', '/checklist'],
   ['10-tools', '/tools'],
   ['11-sick', '/tools/sick'],
-  ['12-fever-med', '/tools/fever-med'],
   ['13-calc-milk', '/tools/calc'],
   ['14-calc-cost', '/tools/calc?tab=cost'],
   ['15-calc-log', '/tools/calc?tab=log'],

@@ -3,7 +3,6 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import AntenatalPage from './pages/AntenatalPage'
 import ChecklistPage from './pages/ChecklistPage'
-import FeverMedPage from './pages/FeverMedPage'
 import MomFoodPage from './pages/MomFoodPage'
 import NamePage from './pages/NamePage'
 import SickPage from './pages/SickPage'
@@ -43,7 +42,6 @@ export default function App() {
           <Route path="checklist" element={<ChecklistPage />} />
           <Route path="tools" element={<ToolsPage />} />
           <Route path="tools/sick" element={<SickPage />} />
-          <Route path="tools/fever-med" element={<FeverMedPage />} />
           <Route path="tools/mom-food" element={<MomFoodPage />} />
           <Route path="tools/name" element={<NamePage />} />
           <Route

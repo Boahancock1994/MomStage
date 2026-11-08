@@ -22,6 +22,7 @@ export const DEFAULT_CALC_SETTINGS: CalcSettings = {
   pricePerCan: '',
   gramsPerCan: '',
   diaperPrice: '',
+  diapersPerDay: '',
   extras: [],
 }
 
@@ -73,9 +74,15 @@ export function calcFormulaUsage(dailyMl: number, pricePerCan: number, gramsPerC
   return { scoopsPerDay, gramsPerDay, gramsPerMonth, cansPerMonth, costPerMonth: cansPerMonth * pricePerCan }
 }
 
-export function calcDiaperCost(ageMonths: number, pricePerPiece: number): { min: number; max: number; avg: number } {
-  const { min, max } = getDiapersPerDay(ageMonths)
+export function calcDiaperCost(
+  ageMonths: number,
+  pricePerPiece: number,
+  /** จำนวนที่ใช้จริงต่อวัน (ถ้ามี) — แทนค่ากลางของช่วงอายุ */
+  piecesPerDay?: number | null,
+): { min: number; max: number; avg: number } {
   const perMonth = (n: number) => n * pricePerPiece * DAYS_PER_COST_MONTH
+  if (piecesPerDay) return { min: perMonth(piecesPerDay), max: perMonth(piecesPerDay), avg: perMonth(piecesPerDay) }
+  const { min, max } = getDiapersPerDay(ageMonths)
   return { min: perMonth(min), max: perMonth(max), avg: perMonth((min + max) / 2) }
 }
 
@@ -159,13 +166,14 @@ export function buildMonthlyExpenses(params: {
 
   const diaperPrice = parseAmount(settings.diaperPrice)
   if (diaperPrice !== null && diaperPrice > 0) {
-    const perDay = getDiapersPerDay(ageMonths)
+    const range = getDiapersPerDay(ageMonths)
+    const pieces = parseAmount(settings.diapersPerDay) || (range.min + range.max) / 2
     lines.push({
       id: 'diapers',
       label: 'ผ้าอ้อม',
-      detail: `${(perDay.min + perDay.max) / 2} ชิ้น/วัน × ${diaperPrice} บาท`,
+      detail: `${pieces} ชิ้น/วัน × ${diaperPrice} บาท`,
       category: 'diapers',
-      amount: calcDiaperCost(ageMonths, diaperPrice).avg,
+      amount: calcDiaperCost(ageMonths, diaperPrice, pieces).avg,
     })
   }
 
@@ -203,11 +211,12 @@ export function compareScenarios(params: {
   pricePerCan: number
   gramsPerCan: number
   diaperPrice: number
+  diapersPerDay?: number | null
   /** ค่าใช้จ่ายอื่นแบบต่อเดือนเท่านั้น */
   otherMonthly?: number
 }): ScenarioCost[] {
   const fullFormula = calcFormulaUsage(params.dailyMl, params.pricePerCan, params.gramsPerCan).costPerMonth
-  const diapers = params.diaperPrice > 0 ? calcDiaperCost(params.ageMonths, params.diaperPrice).avg : 0
+  const diapers = params.diaperPrice > 0 ? calcDiaperCost(params.ageMonths, params.diaperPrice, params.diapersPerDay).avg : 0
   const other = params.otherMonthly ?? 0
   return (['breast', 'mixed', 'formula'] as const).map((scenario) => {
     const formula = fullFormula * FORMULA_SHARE[scenario]

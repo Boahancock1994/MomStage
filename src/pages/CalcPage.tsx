@@ -1,5 +1,5 @@
 /**
- * เครื่องคิดเลขแม่ลูกอ่อน 3 แท็บ: ปริมาณนม / ค่าใช้จ่ายต่อเดือน / บันทึกการให้นมและการนอน
+ * ลูกคนนี้ใช้เงินเท่าไหร่ (เดิม: เครื่องคิดเลขแม่ลูกอ่อน) 3 แท็บ: ปริมาณนม / ค่าใช้จ่ายต่อเดือน / บันทึกการให้นมและการนอน
  * ค่าที่กรอกในแท็บ 1–2 จำไว้ใน store ของลูกแต่ละคน (calcSettings)
  * ตรรกะอยู่ใน src/lib/babyCalc.ts และ src/lib/careLog.ts
  */
@@ -97,7 +97,7 @@ export default function CalcPage() {
     <>
       <BackToTools />
       <PageHeader
-        title="เครื่องคิดเลขแม่ลูกอ่อน"
+        title="ลูกคนนี้ใช้เงินเท่าไหร่"
         subtitle={born ? `${born.name} อายุ ${describeBabyAge(getBabyAge(born.birthDate!, now))}` : 'กรอกน้ำหนักเพื่อคำนวณ'}
       />
 
@@ -274,6 +274,7 @@ function CostTab({
         pricePerCan: price,
         gramsPerCan: grams,
         diaperPrice: parseAmount(settings.diaperPrice) ?? 0,
+        diapersPerDay: parseAmount(settings.diapersPerDay),
         otherMonthly,
       })
     : []
@@ -344,24 +345,39 @@ function CostTab({
         )}
 
         <h2 className="mb-3 mt-5 font-semibold">ผ้าอ้อม</h2>
-        <Field
-          id={`${uid}-diaper`}
-          label="ราคาต่อชิ้น (บาท)"
-          hint={`ช่วงอายุ${diapersPerDay.label} ใช้ประมาณ ${diapersPerDay.min}–${diapersPerDay.max} ชิ้น/วัน · เว้นว่างถ้าไม่ต้องการนับ`}
-        >
-          <input
-            id={`${uid}-diaper`}
-            type="number"
-            inputMode="decimal"
-            min="0"
-            step="0.5"
-            value={settings.diaperPrice}
-            onChange={(e) => update({ diaperPrice: e.target.value })}
-            placeholder="เช่น 6"
-            aria-describedby={`${uid}-diaper-hint`}
-            className={inputClass}
-          />
-        </Field>
+<div className="grid grid-cols-2 gap-3">
+          <Field id={`${uid}-diaper`} label="ราคาต่อชิ้น (บาท)">
+            <input
+              id={`${uid}-diaper`}
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="0.5"
+              value={settings.diaperPrice}
+              onChange={(e) => update({ diaperPrice: e.target.value })}
+              placeholder="เช่น 6"
+              aria-describedby={`${uid}-diaper-note`}
+              className={inputClass}
+            />
+          </Field>
+          <Field id={`${uid}-diaper-count`} label="จำนวนชิ้นต่อวัน">
+            <input
+              id={`${uid}-diaper-count`}
+              type="number"
+              inputMode="numeric"
+              min="0"
+              step="1"
+              value={settings.diapersPerDay}
+              onChange={(e) => update({ diapersPerDay: e.target.value })}
+              placeholder={`ค่ากลาง ${(diapersPerDay.min + diapersPerDay.max) / 2}`}
+              aria-describedby={`${uid}-diaper-note`}
+              className={inputClass}
+            />
+          </Field>
+        </div>
+        <p id={`${uid}-diaper-note`} className="mt-2 text-sm text-ink-muted">
+          ช่วงอายุ {diapersPerDay.label} ใช้ประมาณ {diapersPerDay.min}–{diapersPerDay.max} ชิ้น/วัน · ไม่กรอกจำนวน แอปใช้ค่ากลาง · เว้นราคาว่างถ้าไม่ต้องการนับ
+        </p>
       </Card>
 
       <ExtrasCard extras={settings.extras} onAdd={addExtra} onPatch={patchExtra} onRemove={removeExtra} newEntry={newEntry} />
@@ -384,7 +400,7 @@ function CostTab({
 
       <p className="text-xs text-ink-muted">
         สมมติฐาน: 1 ช้อนตวง ≈ {GRAMS_PER_SCOOP} กรัม ต่อน้ำ {ML_PER_SCOOP} มล. (ตรวจกับฉลากนมที่ใช้จริง) · 1 เดือน = 30 วัน · นมผสม = นมผงครึ่งหนึ่ง ·
-        ค่าผ้าอ้อมใช้ค่ากลางของช่วงตามอายุ · ค่าใช้จ่ายอื่น = ผลรวมของ (ราคาต่อหน่วย × จำนวนต่อเดือน) ทุกยอด รายการชื่อซ้ำรวมเป็นแท่งเดียว · ค่าที่กรอกจำไว้ในเครื่องนี้
+        ค่าผ้าอ้อม = ราคาต่อชิ้น × จำนวนต่อวัน (ไม่กรอกใช้ค่ากลางตามอายุ) × 30 วัน · ค่าใช้จ่ายอื่น = ผลรวมของ (ราคาต่อหน่วย × จำนวนต่อเดือน) ทุกยอด รายการชื่อซ้ำรวมเป็นแท่งเดียว · ค่าที่กรอกจำไว้ในเครื่องนี้
       </p>
     </div>
   )

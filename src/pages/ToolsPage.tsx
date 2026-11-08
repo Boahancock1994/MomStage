@@ -1,15 +1,14 @@
 /** ผู้ช่วย — รวมเครื่องมือช่วยคุณแม่ */
-import { CalculatorIcon, CaretRightIcon, FirstAidIcon, ForkKnifeIcon, MapPinIcon, PillIcon, SignatureIcon, type Icon } from '../components/icons'
+import { CalculatorIcon, CaretRightIcon, FirstAidIcon, ForkKnifeIcon, MapPinIcon, SignatureIcon, type Icon } from '../components/icons'
 import { Link } from 'react-router-dom'
 import { Badge, PageHeader } from '../components/ui'
 
 const TOOLS: { to?: string; title: string; desc: string; icon: Icon }[] = [
   { to: '/tools/sick', title: 'ลูกป่วย ควรไปหาหมอไหม', desc: 'ตอบคำถามทีละข้อ แอปบอกระดับความเร่งด่วนตามอายุลูก', icon: FirstAidIcon },
-  { to: '/tools/fever-med', title: 'คำนวณยาลดไข้', desc: 'ขนาดยาพาราเซตามอลน้ำเชื่อมเป็น มล. ตามน้ำหนักล่าสุด', icon: PillIcon },
-  { to: '/tools/mom-food', title: 'อาหารแม่', desc: 'กินอะไรดีช่วงตั้งครรภ์และหลังคลอด ประโยชน์ ปริมาณต่อวัน อาหารเสริม และสิ่งที่ควรเลี่ยง', icon: ForkKnifeIcon },
-  { to: '/tools/calc', title: 'เครื่องคิดเลขแม่ลูกอ่อน', desc: 'ปริมาณนมต่อมื้อ ค่าใช้จ่ายต่อเดือน และบันทึกการให้นม/การนอน', icon: CalculatorIcon },
-  { to: '/tools/name', title: 'ตั้งชื่อลูกตามทักษา', desc: 'หาอักษรกาลกิณีตามวันเกิด กรองชื่อพร้อมความหมาย และตรวจชื่อที่คิดไว้', icon: SignatureIcon },
-  { to: '/tools/nursing-map', title: 'แผนที่ห้องให้นม', desc: 'ห้องให้นมและมุมเปลี่ยนผ้าอ้อมใกล้คุณ ช่วยกันเพิ่มและยืนยัน', icon: MapPinIcon },
+  { to: '/tools/mom-food', title: 'กินแบบไหนลูกปลอดภัย', desc: 'กินอะไรดีช่วงตั้งครรภ์และหลังคลอด ประโยชน์ ปริมาณต่อวัน อาหารเสริม และสิ่งที่ควรเลี่ยง', icon: ForkKnifeIcon },
+  { to: '/tools/calc', title: 'ลูกคนนี้ใช้เงินเท่าไหร่', desc: 'ปริมาณนมต่อมื้อ ค่าใช้จ่ายต่อเดือน และบันทึกการให้นม/การนอน', icon: CalculatorIcon },
+  { to: '/tools/name', title: 'ตั้งชื่อลูกตามวันเกิด', desc: 'หาอักษรกาลกิณีตามวันเกิด (ทักษา) กรองชื่อพร้อมความหมาย และตรวจชื่อที่คิดไว้', icon: SignatureIcon },
+  { to: '/tools/nursing-map', title: 'พิกัดห้องให้นม/เปลี่ยนผ้าอ้อม', desc: 'ห้องให้นมและมุมเปลี่ยนผ้าอ้อมใกล้คุณ ช่วยกันเพิ่มและยืนยัน', icon: MapPinIcon },
 ]
 
 export default function ToolsPage() {

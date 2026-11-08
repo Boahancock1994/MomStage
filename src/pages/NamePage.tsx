@@ -25,7 +25,9 @@ import {
 import { useAppStore } from '../store/useAppStore'
 import type { Child } from '../types'
 
-const spaced = (letters: string) => [...letters].join(' ')
+/** สระ/วรรณยุกต์ที่ต้องเกาะพยัญชนะ (ถ้าแสดงเดี่ยว ๆ จะซ้อนกัน) — ใส่วงกลมประ ◌ เป็นตัวรองรับ */
+const COMBINING = /[\u0E31\u0E33-\u0E3A\u0E47-\u0E4E]/
+const spaced = (letters: string) => [...letters].map((c) => (COMBINING.test(c) ? `\u25CC${c}` : c)).join(' ')
 
 const ROLE_STYLE: Partial<Record<Role, string>> = {
   กาลกิณี: 'bg-danger-soft text-danger',
@@ -55,7 +57,7 @@ function NameTool({ child }: { child: Child }) {
   return (
     <>
       <BackToTools />
-      <PageHeader title="ตั้งชื่อลูกตามทักษา" subtitle="หาอักษรกาลกิณีตามวันเกิด แล้วเลือกชื่อที่ไม่มีอักษรนั้น" />
+      <PageHeader title="ตั้งชื่อลูกตามวันเกิด" subtitle="หาอักษรกาลกิณีตามวันเกิด แล้วเลือกชื่อที่ไม่มีอักษรนั้น" />
 
       <Card>
         <h2 className="font-semibold">วันเกิดของ{child.name}</h2>
@@ -116,7 +118,12 @@ function NameTool({ child }: { child: Child }) {
             <p className="mt-1 text-2xl font-bold tracking-wider text-danger">
               {day === 'mon' ? 'สระทุกตัว' : spaced(getKalakiniLetters(day))}
             </p>
-            {day === 'mon' && <p className="mt-1 text-sm text-ink-muted">{spaced(getKalakiniLetters(day))} — ชื่อต้องไม่มีรูปสระเลย เช่น ธนพร</p>}
+            {day === 'mon' && (
+              <>
+                <p className="mt-1 text-base leading-loose tracking-wide text-ink-muted [overflow-wrap:anywhere]">{spaced(getKalakiniLetters(day))}</p>
+                <p className="text-sm text-ink-muted">ชื่อต้องไม่มีรูปสระเลย เช่น ธนพร</p>
+              </>
+            )}
           </div>
         )}
       </Card>
@@ -166,7 +173,7 @@ function TaksaTable({ day }: { day: TaksaDay }) {
                 <span className="block text-xs font-normal text-ink-muted">{ROLE_MEANINGS[r.role]}</span>
               </th>
               <td className="py-2 pr-2 align-top">{PLANET_LABELS[r.planet]}</td>
-              <td className="py-2 align-top tracking-wide [overflow-wrap:anywhere]">{r.planet === 'sun' ? 'สระทุกตัว' : spaced(r.letters)}</td>
+              <td className="py-2 align-top leading-loose tracking-wide [overflow-wrap:anywhere]">{r.planet === 'sun' ? 'สระทุกตัว' : spaced(r.letters)}</td>
             </tr>
           ))}
         </tbody>

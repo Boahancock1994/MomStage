@@ -67,6 +67,14 @@ describe('buildMonthlyExpenses', () => {
     expect(r.total).toBe(1350 + 1200 + 450 + 299)
   })
 
+  it('กรอกจำนวนผ้าอ้อมต่อวันเอง ใช้แทนค่ากลางตามอายุ', () => {
+    const base = { ...DEFAULT_CALC_SETTINGS, diaperPrice: '5' }
+    const auto = buildMonthlyExpenses({ settings: base, dailyMl: null, ageMonths: 3 })
+    expect(auto.lines[0]).toMatchObject({ id: 'diapers', amount: 9 * 5 * 30 })
+    const custom = buildMonthlyExpenses({ settings: { ...base, diapersPerDay: '6' }, dailyMl: null, ageMonths: 3 })
+    expect(custom.lines[0]).toMatchObject({ id: 'diapers', amount: 6 * 5 * 30, detail: '6 ชิ้น/วัน × 5 บาท' })
+  })
+
   it('หลายยอดในรายการเดียว และรายการชื่อซ้ำ (ต่างช่องว่าง/ตัวพิมพ์) รวมเป็นบรรทัดเดียว', () => {
     const dup = [
       ...extras,

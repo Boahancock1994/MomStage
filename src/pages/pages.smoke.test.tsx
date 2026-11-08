@@ -5,7 +5,6 @@ import { Layout } from '../components/Layout'
 import AntenatalPage from './AntenatalPage'
 import ChecklistPage from './ChecklistPage'
 import CalcPage from './CalcPage'
-import FeverMedPage from './FeverMedPage'
 import MomFoodPage from './MomFoodPage'
 import GrowthPage from './GrowthPage'
 import SickPage from './SickPage'
@@ -32,7 +31,6 @@ function Dump({ path }: { path: string }) {
           <Route path="growth" element={<GrowthPage />} />
           <Route path="tools" element={<ToolsPage />} />
           <Route path="tools/sick" element={<SickPage />} />
-          <Route path="tools/fever-med" element={<FeverMedPage />} />
           <Route path="tools/mom-food" element={<MomFoodPage />} />
           <Route path="tools/calc" element={<CalcPage />} />
           <Route path="tools/name" element={<NamePage />} />
@@ -60,7 +58,7 @@ it('หน้าหลักทุกหน้า render ได้โดยไ�
   const store = grab()
   for (const child of store.children) {
     store.setActiveChild(child.id)
-    for (const p of ['/', '/vaccine', '/antenatal', '/checklist', '/milestones', '/milestones/history', '/growth', '/tools', '/tools/sick', '/tools/fever-med', '/tools/mom-food', '/tools/calc', '/tools/calc?tab=cost', '/tools/calc?tab=log', '/tools/name']) {
+    for (const p of ['/', '/vaccine', '/antenatal', '/checklist', '/milestones', '/milestones/history', '/growth', '/tools', '/tools/sick', '/tools/mom-food', '/tools/calc', '/tools/calc?tab=cost', '/tools/calc?tab=log', '/tools/name']) {
       const html = renderToString(<Dump path={p} />)
       expect(html.length).toBeGreaterThan(500)
     }

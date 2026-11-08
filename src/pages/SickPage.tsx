@@ -2,14 +2,12 @@
  * ตัวช่วยตัดสินใจเมื่อลูกป่วย — ถามทีละข้อ (decision tree) แล้วบอกระดับ เขียว / เหลือง / แดง
  * ตรรกะอยู่ใน src/lib/sick.ts และกฎทั้งหมดอยู่ใน src/data/sickRules.ts
  */
-import { ArrowCounterClockwiseIcon, ArrowLeftIcon, CheckCircleIcon, HospitalIcon, PillIcon, WarningIcon, WarningOctagonIcon } from '../components/icons'
+import { ArrowCounterClockwiseIcon, ArrowLeftIcon, CheckCircleIcon, HospitalIcon, WarningIcon, WarningOctagonIcon } from '../components/icons'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { BackToTools, Call1669Button, NotDiagnosisNote } from '../components/ToolSafety'
 import { Button, Card, PageHeader, ProgressBar, inputClass } from '../components/ui'
 import { MAIN_SYMPTOMS, type MainSymptom, type SickAnswers, type SickQuestion, type TriageLevel } from '../data/sickRules'
 import { describeBabyAge, getBabyAge } from '../lib/age'
-import { isParacetamolAllowed } from '../lib/paracetamol'
 import { TRIAGE_META, getApplicableQuestions, getNextQuestion, getSickContext, triage } from '../lib/sick'
 import { useToday } from '../lib/useToday'
 import { useAppStore } from '../store/useAppStore'
@@ -88,7 +86,6 @@ export default function SickPage() {
           level={result.level}
           reasons={result.matched.map((m) => ({ level: m.level, text: m.reason }))}
           homeCare={result.homeCare}
-          showFeverMed={answers.symptoms.includes('fever') && result.level !== 'red' && isParacetamolAllowed(ctx.ageMonths)}
           onRestart={restart}
         />
       )}
@@ -278,13 +275,11 @@ function ResultView({
   level,
   reasons,
   homeCare,
-  showFeverMed,
   onRestart,
 }: {
   level: TriageLevel
   reasons: { level: TriageLevel; text: string }[]
   homeCare: string[]
-  showFeverMed: boolean
   onRestart: () => void
 }) {
   const style = LEVEL_STYLE[level]
@@ -346,16 +341,6 @@ function ResultView({
             ไปโรงพยาบาลทันทีถ้ามีอาการชัก ซึมลง หายใจหอบ ปากเขียว ไม่ยอมดื่มน้ำ หรือมีผื่นจุดเลือดออก
           </p>
         </Card>
-      )}
-
-      {showFeverMed && (
-        <Link
-          to="/tools/fever-med"
-          className="flex min-h-14 items-center gap-3 rounded-2xl border border-line bg-surface px-4 font-medium transition-colors duration-150 hover:bg-surface-muted"
-        >
-          <PillIcon size={22} className="text-primary-strong" aria-hidden="true" />
-          <span className="flex-1">คำนวณขนาดยาลดไข้ตามน้ำหนักลูก</span>
-        </Link>
       )}
 
       {level !== 'red' && (

@@ -145,7 +145,7 @@ export default function NursingMapPage() {
   return (
     <>
       <BackToTools />
-      <PageHeader title="แผนที่ห้องให้นม" subtitle="ห้องให้นมและมุมเปลี่ยนผ้าอ้อม — ช่วยกันเพิ่มและยืนยันข้อมูล" />
+      <PageHeader title="พิกัดห้องให้นม/เปลี่ยนผ้าอ้อม" subtitle="ห้องให้นมและมุมเปลี่ยนผ้าอ้อม — ช่วยกันเพิ่มและยืนยันข้อมูล" />
 
       <div className="mb-3 grid grid-cols-2 gap-2">
         <Button onClick={() => locate()} disabled={locating}>

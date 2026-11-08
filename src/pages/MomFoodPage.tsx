@@ -49,7 +49,7 @@ export default function MomFoodPage() {
   return (
     <>
       <BackToTools />
-      <PageHeader title="อาหารแม่" subtitle="กินอะไรดี กินเท่าไร ช่วงตั้งครรภ์และหลังคลอด" />
+      <PageHeader title="กินแบบไหนลูกปลอดภัย" subtitle="กินอะไรดี กินเท่าไร ช่วงตั้งครรภ์และหลังคลอด" />
 
       <Segmented<MomPhase>
         name={`${uid}-phase`}

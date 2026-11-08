@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import type { SickAnswers } from '../data/sickRules'
-import { calcParacetamolDose, isParacetamolAllowed } from './paracetamol'
 import { getApplicableQuestions, getNextQuestion, triage } from './sick'
 
 const base = (patch: Partial<SickAnswers>): SickAnswers => ({ symptoms: ['fever'], danger: [], ...patch })
@@ -67,33 +66,5 @@ describe('triage: เหลือง / เขียว', () => {
     const r = triage({ symptoms: ['cough'], danger: [], coughType: [] }, age(24))
     expect(r.level).toBe('green')
     expect(r.homeCare.length).toBeGreaterThan(0)
-  })
-})
-
-describe('calcParacetamolDose', () => {
-  it('น้ำหนัก 8 กก. ยา 120 มก./5 มล. → 80–120 มก. = 3.3–5 มล.', () => {
-    const d = calcParacetamolDose(8, 120)
-    expect(d).toMatchObject({ minMg: 80, maxMg: 120, minMl: 3.3, maxMl: 5, suggestedMl: 5, suggestedMg: 120 })
-  })
-
-  it('ความเข้มข้นสูงขึ้น ปริมาณ มล. ลดลง และปริมาณแนะนำไม่เกินขนาดสูงสุด', () => {
-    const d160 = calcParacetamolDose(8, 160)
-    expect(d160.minMl).toBe(2.5)
-    expect(d160.maxMl).toBe(3.8)
-    expect(d160.suggestedMl).toBe(3.5)
-    const d250 = calcParacetamolDose(8, 250)
-    expect(d250.maxMl).toBe(2.4)
-    expect(d250.suggestedMg).toBeLessThanOrEqual(d250.maxMg)
-    expect(d250.suggestedMg).toBeGreaterThanOrEqual(d250.minMg)
-  })
-
-  it('ไม่เกิน 500 มก. ต่อครั้ง', () => {
-    expect(calcParacetamolDose(50, 250).maxMg).toBe(500)
-  })
-
-  it('ปิดการใช้สำหรับอายุต่ำกว่า 3 เดือนหรือไม่ทราบอายุ', () => {
-    expect(isParacetamolAllowed(2)).toBe(false)
-    expect(isParacetamolAllowed(null)).toBe(false)
-    expect(isParacetamolAllowed(3)).toBe(true)
   })
 })
