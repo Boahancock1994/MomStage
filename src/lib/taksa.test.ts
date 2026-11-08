@@ -70,7 +70,8 @@ describe('analyzeName', () => {
 
 describe('ฐานข้อมูลชื่อและการกรอง', () => {
   it('มีอย่างน้อย 150 ชื่อ ไม่ซ้ำ แยกชาย/หญิง พร้อมความหมาย', () => {
-    expect(NAMES.length).toBeGreaterThanOrEqual(150)
+    expect(NAMES.length).toBeGreaterThanOrEqual(250)
+    expect(NAMES.filter((n) => n.modern).length).toBeGreaterThanOrEqual(100)
     expect(new Set(NAMES.map((n) => n.name)).size).toBe(NAMES.length)
     expect(NAMES.filter((n) => n.gender === 'boy').length).toBeGreaterThanOrEqual(70)
     expect(NAMES.filter((n) => n.gender === 'girl').length).toBeGreaterThanOrEqual(70)
