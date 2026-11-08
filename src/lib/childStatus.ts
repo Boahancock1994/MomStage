@@ -57,7 +57,7 @@ export function validateChildDate(mode: ChildMode, date: string, today: Date = n
 
   if (d > now) return 'วันเกิดต้องไม่เป็นวันในอนาคต'
   if (d < subMonths(now, MAX_CHILD_AGE_MONTHS)) {
-    return 'แม่สเตจดูแลลูกตั้งแต่ตั้งครรภ์ถึงอายุ 3 ขวบ — ลูกอายุเกินช่วงที่แอปรองรับ'
+    return 'MomStage ดูแลลูกตั้งแต่ตั้งครรภ์ถึงอายุ 3 ขวบ — ลูกอายุเกินช่วงที่แอปรองรับ'
   }
   return null
 }

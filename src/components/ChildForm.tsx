@@ -216,7 +216,7 @@ function LivePreview({ mode, date, today }: { mode: ChildMode; date: string; tod
     const p = getPregnancyWeek(date, today)
     return (
       <div className="rounded-2xl border border-primary/20 bg-primary-soft p-4" aria-live="polite">
-        <p className="text-sm font-medium text-primary-strong">แม่สเตจคำนวณให้แล้ว</p>
+        <p className="text-sm font-medium text-primary-strong">MomStage คำนวณให้แล้ว</p>
         <p className="mt-1 text-xl font-bold text-ink">
           {describePregnancy(p)} · ไตรมาส {p.trimester}
         </p>
@@ -235,7 +235,7 @@ function LivePreview({ mode, date, today }: { mode: ChildMode; date: string; tod
   const age = getBabyAge(date, today)
   return (
     <div className="rounded-2xl border border-primary/20 bg-primary-soft p-4" aria-live="polite">
-      <p className="text-sm font-medium text-primary-strong">แม่สเตจคำนวณให้แล้ว</p>
+      <p className="text-sm font-medium text-primary-strong">MomStage คำนวณให้แล้ว</p>
       <p className="mt-1 text-xl font-bold text-ink">ลูกอายุ {describeBabyAge(age)}</p>
       <p className="mt-1 text-sm text-ink-muted">
         รวม {age.totalDays.toLocaleString('th-TH')} วัน หรือ {age.totalWeeks} สัปดาห์ · เกิด {formatThaiDate(date)}

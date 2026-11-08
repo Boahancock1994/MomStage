@@ -81,7 +81,7 @@ function StatusNotice({ status }: { status: ChildStatus }) {
         <p className="mt-1">
           {overdue
             ? 'ถ้าคลอดแล้ว บันทึกวันเกิดเพื่อให้แอปเริ่มนับอายุและตารางวัคซีนของลูก'
-            : `แม่สเตจออกแบบสำหรับลูกอายุไม่เกิน ${MAX_CHILD_AGE_MONTHS / 12} ขวบ ข้อมูลบางส่วนอาจไม่ครอบคลุม ดูสมุดสุขภาพเด็ก (สมุดสีชมพู) ประกอบ`}
+            : `MomStage ออกแบบสำหรับลูกอายุไม่เกิน ${MAX_CHILD_AGE_MONTHS / 12} ขวบ ข้อมูลบางส่วนอาจไม่ครอบคลุม ดูสมุดสุขภาพเด็ก (สมุดสีชมพู) ประกอบ`}
         </p>
         {overdue && (
           <Link to="/settings" className="mt-2 inline-flex min-h-11 items-center gap-1 font-semibold text-primary-strong hover:underline">
