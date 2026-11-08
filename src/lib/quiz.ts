@@ -120,7 +120,7 @@ export function scoreQuiz(
 
 export type QuizDueReason = 'never' | 'retest' | 'waiting' | 'done'
 
-/** ควรทำควิซช่วงนี้ไหม — ใช้กับปุ่ม "ทำควิซช่วงนี้" บนหน้า "ตอนนี้" */
+/** ควรทำควิซช่วงนี้ไหม — ใช้กับปุ่ม "ทำควิซช่วงนี้" บนหน้าหลัก */
 export function getQuizStatus(
   child: Child,
   today: Date = new Date(),

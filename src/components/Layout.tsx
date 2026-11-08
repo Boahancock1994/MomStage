@@ -9,6 +9,7 @@ import {
   PuzzlePieceIcon,
   SyringeIcon,
   ToolboxIcon,
+  UsersThreeIcon,
   type Icon,
 } from './icons'
 import { useEffect, useRef } from 'react'
@@ -17,12 +18,13 @@ import { Logo } from './Logo'
 import { getChildStatus } from '../lib/childStatus'
 import { useAppStore } from '../store/useAppStore'
 
-/** เมนูหลัก ไม่เกิน 5 รายการตามหลัก bottom navigation (Material Design) */
+/** เมนูหลัก 6 รายการ — ชื่อสั้นเพื่อให้แต่ละปุ่มกว้างพอแตะ (≥ 60px บนจอ 360px) */
 const NAV_ITEMS: { to: string; label: string; icon: Icon }[] = [
-  { to: '/', label: 'ตอนนี้', icon: HouseIcon },
+  { to: '/', label: 'หน้าหลัก', icon: HouseIcon },
   { to: '/vaccine', label: 'วัคซีน', icon: SyringeIcon },
   { to: '/milestones', label: 'พัฒนาการ', icon: PuzzlePieceIcon },
-  { to: '/growth', label: 'การเติบโต', icon: ChartLineIcon },
+  { to: '/growth', label: 'เติบโต', icon: ChartLineIcon },
+  { to: '/community', label: 'ชุมชน', icon: UsersThreeIcon },
   { to: '/tools', label: 'เครื่องมือ', icon: ToolboxIcon },
 ]
 
@@ -103,14 +105,14 @@ export function Layout() {
         aria-label="เมนูหลัก"
         className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
       >
-        <ul className="mx-auto grid max-w-md grid-cols-5">
+        <ul className="mx-auto grid max-w-md grid-cols-6">
           {NAV_ITEMS.map(({ to, label, icon: NavIcon }) => (
             <li key={to}>
               <NavLink
                 to={to}
                 end={to === '/'}
                 className={({ isActive }) =>
-                  `flex min-h-16 flex-col items-center justify-center gap-0.5 text-xs font-medium transition-colors duration-150 ${
+                  `flex min-h-16 flex-col items-center justify-center gap-0.5 whitespace-nowrap text-xs font-medium transition-colors duration-150 ${
                     isActive ? 'text-primary-strong' : 'text-ink-muted hover:text-ink'
                   }`
                 }
@@ -118,7 +120,7 @@ export function Layout() {
                 {({ isActive }) => (
                   <>
                     <span
-                      className={`grid h-8 w-14 place-items-center rounded-full transition-colors duration-150 ${
+                      className={`grid h-8 w-12 place-items-center rounded-full transition-colors duration-150 ${
                         isActive ? 'bg-primary-soft' : ''
                       }`}
                     >

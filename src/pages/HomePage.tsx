@@ -1,30 +1,34 @@
 /**
- * หน้า "ตอนนี้" — dashboard รวมทุกอย่างที่ต้องรู้ในช่วงวัยนี้
- * ลำดับ: อายุ → สิ่งที่ต้องทำเร็วๆ นี้ → พัฒนาการ → checklist
+ * หน้าหลัก — dashboard สรุปภาพรวมของช่วงวัยนี้ด้วยตัวเลข วงแหวน และกราฟจิ๋ว
+ * แตะการ์ดเพื่อดูรายละเอียดในหน้านั้น ๆ
  * ทุกตัวเลขมาจาก src/lib/* (หน้านี้ไม่คำนวณเอง)
  */
 import {
+  CalendarCheckIcon,
   CaretRightIcon,
   CheckCircleIcon,
-  ClipboardTextIcon,
+  ChartLineIcon,
+  ClockIcon,
+  InfoIcon,
   ListChecksIcon,
   PuzzlePieceIcon,
+  QuestionIcon,
   StethoscopeIcon,
   SyringeIcon,
-  InfoIcon,
-  UsersThreeIcon,
+  TestTubeIcon,
+  WarningCircleIcon,
 } from '../components/icons'
 import { Link } from 'react-router-dom'
-import { DashboardCard } from '../components/DashboardCard'
-import { ProgressBar } from '../components/ui'
-import { VaccineStatusBadge } from '../components/VaccineStatusBadge'
+import { Ring, Sparkline, StatRow, Tile } from '../components/DashboardWidgets'
 import { FULL_TERM_DAYS, MAX_CHILD_AGE_MONTHS } from '../data/constants'
+import { DOMAIN_ORDER } from '../data/dspm'
 import { getRelevantStages } from '../lib/checklist'
 import { getChildStatus, type ChildStatus } from '../lib/childStatus'
-import { formatAgeMonths, formatRelativeDays, formatThaiDate } from '../lib/format'
-import { getPregnancyMilestones } from '../lib/pregnancy'
-import { getQuizForGroup, getQuizStatus } from '../lib/quiz'
-import { DSPM_AGE_GROUPS } from '../data/dspm'
+import { formatRelativeDays } from '../lib/format'
+import { assessGrowth, formatPercentile } from '../lib/growth'
+import { getNextVisit, getPregnancyMilestones } from '../lib/pregnancy'
+import { getQuizForGroup, getQuizStatus, scoreQuiz } from '../lib/quiz'
+import { toDay } from '../lib/age'
 import { useToday } from '../lib/useToday'
 import { getActionableVaccines, getNextUpcomingVaccine, getVaccineSchedule } from '../lib/vaccine'
 import { useAppStore } from '../store/useAppStore'
@@ -38,26 +42,28 @@ export default function HomePage() {
   if (!status) return null
 
   return (
-    <div className="space-y-4">
-      <h1 className="sr-only">ตอนนี้ต้องทำอะไร</h1>
+    <div className="space-y-3">
+      <h1 className="sr-only">หน้าหลัก</h1>
       <StatusNotice status={status} />
       <AgeCard child={activeChild} status={status} />
       {status.mode === 'born' ? (
-        <BornTodoCard child={activeChild} today={today} />
+        <>
+          <VaccineTile child={activeChild} today={today} />
+          <div className="grid grid-cols-2 gap-3">
+            <GrowthTile child={activeChild} />
+            <ChecklistTile child={activeChild} today={today} />
+          </div>
+          <DevelopmentTile child={activeChild} today={today} />
+        </>
       ) : (
-        <PregnancyTodoCard dueDate={activeChild.dueDate!} today={today} />
+        <>
+          <AntenatalTile dueDate={activeChild.dueDate!} today={today} />
+          <div className="grid grid-cols-2 gap-3">
+            <ChecksNowTile dueDate={activeChild.dueDate!} today={today} />
+            <ChecklistTile child={activeChild} today={today} />
+          </div>
+        </>
       )}
-      <DevelopmentCard child={activeChild} status={status} today={today} />
-      <ChecklistCard child={activeChild} today={today} />
-
-      <Link
-        to="/community"
-        className="flex min-h-14 items-center gap-3 rounded-2xl border border-line bg-surface px-4 font-medium transition-colors duration-150 hover:bg-surface-muted"
-      >
-        <UsersThreeIcon size={22} className="text-primary-strong" aria-hidden="true" />
-        <span className="flex-1">ชุมชนคุณแม่ช่วงวัยเดียวกัน</span>
-        <CaretRightIcon size={18} className="text-ink-muted" aria-hidden="true" />
-      </Link>
     </div>
   )
 }
@@ -117,7 +123,7 @@ function AgeCard({ child, status }: { child: Child; status: ChildStatus }) {
             aria-valuemax={100}
           >
             <div
-              className="h-full rounded-full bg-accent"
+              className="h-full rounded-full bg-accent-strong"
               style={{ width: `${Math.min(100, (status.pregnancy.totalDays / FULL_TERM_DAYS) * 100)}%` }}
             />
           </div>
@@ -130,176 +136,217 @@ function AgeCard({ child, status }: { child: Child; status: ChildStatus }) {
           </p>
         </>
       )}
-      <p className="mt-3 flex items-center gap-1 text-sm font-semibold">
-        {status.mode === 'pregnant' ? 'ดูนัดฝากครรภ์ทั้งหมด' : 'ดูการเติบโต'}
-        <CaretRightIcon size={16} className="transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden="true" />
-      </p>
     </Link>
   )
 }
 
-function BornTodoCard({ child, today }: { child: Child; today: Date }) {
+/** วัคซีน: วงแหวนเข็มที่ฉีดแล้ว + จำนวนตามสถานะ + เข็มที่ต้องทำต่อ */
+function VaccineTile({ child, today }: { child: Child; today: Date }) {
   const schedule = getVaccineSchedule(child, today)
   if (!schedule) return null
+  // เข็มเฉพาะกรณีไม่นับ เพื่อให้ตัวเลขตรงกับตารางพื้นฐานในสมุดสีชมพู
+  const required = schedule.items.filter((v) => !v.optional)
+  const count = (s: string) => required.filter((v) => v.status === s).length
+  const done = count('done')
   const actionable = getActionableVaccines(schedule)
   const next = getNextUpcomingVaccine(schedule)
-  const shown = actionable.slice(0, 4)
 
   return (
-    <DashboardCard to="/vaccine" title="สิ่งที่ต้องทำเร็วๆ นี้" icon={SyringeIcon} linkLabel="วัคซีน">
-      {shown.length > 0 ? (
-        <ul className="space-y-2">
-          {shown.map((v) => (
-            <li key={v.id} className="flex items-center gap-3 rounded-xl bg-surface-muted px-3 py-2">
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-medium leading-snug">{v.nameTh}</span>
-                <span className="block text-xs text-ink-muted">
-                  นัด {formatThaiDate(v.dueDate, true)} · {formatRelativeDays(-v.daysFromDue)}
-                </span>
-              </span>
-              <VaccineStatusBadge status={v.status} />
-            </li>
-          ))}
-          {actionable.length > shown.length && (
-            <li className="text-sm text-ink-muted">และอีก {actionable.length - shown.length} รายการ</li>
-          )}
-        </ul>
-      ) : (
-        <p className="flex items-center gap-2 text-ink">
-          <CheckCircleIcon size={20} className="text-success" aria-hidden="true" />
-          ไม่มีวัคซีนค้างในช่วงนี้
-        </p>
-      )}
-      {next && (
-        <p className="mt-3 text-sm text-ink-muted">
-          เข็มถัดไป: {next.nameTh} ตอนอายุ {formatAgeMonths(next.ageMonths)} ({formatThaiDate(next.dueDate, true)},{' '}
-          {formatRelativeDays(-next.daysFromDue)})
-        </p>
-      )}
-    </DashboardCard>
-  )
-}
-
-function PregnancyTodoCard({ dueDate, today }: { dueDate: string; today: Date }) {
-  const m = getPregnancyMilestones(dueDate, today)
-  // ช่วงนี้: นัด/ตรวจ/วัคซีนก่อน รายการดูแลตัวเองที่ยาวตลอดครรภ์ไว้ท้าย
-  const current = m.items
-    .filter((i) => i.status === 'current')
-    .sort((a, b) => Number(a.kind === 'self-care') - Number(b.kind === 'self-care'))
-  const nextUpcoming = m.items.find((i) => i.status === 'upcoming' && i.kind !== 'self-care')
-
-  return (
-    <DashboardCard to="/antenatal" title="สิ่งที่ต้องทำเร็วๆ นี้" icon={StethoscopeIcon} linkLabel="นัดฝากครรภ์">
-      <ul className="space-y-2">
-        {current.slice(0, 4).map((i) => (
-          <li key={i.id} className="rounded-xl bg-surface-muted px-3 py-2">
-            <span className="block text-sm font-medium leading-snug">{i.title}</span>
-            <span className="block text-xs text-ink-muted">
-              สัปดาห์ที่ {i.weekFrom}–{i.weekTo} · ถึง {formatThaiDate(i.endDate, true)}
+    <Tile to="/vaccine" title="วัคซีน" icon={SyringeIcon}>
+      <div className="flex items-center gap-4">
+        <Ring value={done} max={required.length}>
+          <span>
+            <span className="block text-xl font-bold tabular-nums text-ink">
+              {done}/{required.length}
             </span>
-          </li>
-        ))}
-      </ul>
-      {nextUpcoming && (
-        <p className="mt-3 text-sm text-ink-muted">
-          ถัดไป: {nextUpcoming.title} (เริ่ม {formatThaiDate(nextUpcoming.startDate, true)})
-        </p>
-      )}
-    </DashboardCard>
+            <span className="block text-xs text-ink-muted">เข็ม</span>
+          </span>
+        </Ring>
+        <ul className="min-w-0 flex-1 space-y-1.5">
+          <StatRow icon={WarningCircleIcon} iconClass="text-danger" label="เลยกำหนด" value={count('overdue')} />
+          <StatRow icon={CalendarCheckIcon} iconClass="text-warning" label="ถึงกำหนด" value={count('due')} />
+          <StatRow icon={CheckCircleIcon} iconClass="text-success" label="ฉีดแล้ว" value={done} />
+        </ul>
+      </div>
+      <p className="mt-3 rounded-xl bg-surface-muted px-3 py-2 text-sm">
+        {actionable.length > 0 ? (
+          <>
+            <span className="text-ink-muted">ถึงคิว: </span>
+            <span className="font-medium">{actionable[0].nameTh}</span>
+            {actionable.length > 1 && <span className="text-ink-muted"> และอีก {actionable.length - 1} เข็ม</span>}
+          </>
+        ) : next ? (
+          <>
+            <span className="text-ink-muted">เข็มถัดไป </span>
+            <span className="font-medium">{formatRelativeDays(-next.daysFromDue)}</span>
+          </>
+        ) : (
+          <span className="font-medium">ครบทุกเข็มพื้นฐานแล้ว</span>
+        )}
+      </p>
+    </Tile>
   )
 }
 
-function DevelopmentCard({ child, status, today }: { child: Child; status: ChildStatus; today: Date }) {
-  const quiz = getQuizStatus(child, today)
-  // ยังไม่คลอด: แสดงทักษะช่วงแรกเกิดไว้ล่วงหน้า
-  const group = quiz?.group ?? DSPM_AGE_GROUPS[0]
-  const { items } = getQuizForGroup(group.id)
+/** การเติบโต: น้ำหนักล่าสุด + เปอร์เซ็นไทล์ + กราฟเส้นจิ๋ว */
+function GrowthTile({ child }: { child: Child }) {
+  const weights = [...child.growthLog]
+    .filter((g) => g.weightKg !== undefined)
+    .sort((a, b) => a.date.localeCompare(b.date))
+  const latest = weights[weights.length - 1]
+  const assessed = child.sex && child.birthDate ? assessGrowth(child.growthLog, child.birthDate, child.sex) : []
+  const latestWeight = [...assessed].reverse().find((a) => a.weight)?.weight
 
   return (
-    <section className="rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-[var(--shadow-card)]">
-      <div className="mb-3 flex items-center gap-2">
-        <PuzzlePieceIcon size={22} className="text-primary-strong" aria-hidden="true" />
-        <h2 className="flex-1 text-lg font-semibold">พัฒนาการช่วงนี้</h2>
-        <Link to="/milestones" className="flex min-h-11 items-center gap-0.5 text-sm font-medium text-primary-strong hover:underline">
-          ดูเพิ่ม
-          <CaretRightIcon size={16} aria-hidden="true" />
-        </Link>
-      </div>
-
-      <p className="font-medium">
-        {status.mode === 'pregnant' ? `หลังคลอด ช่วง${group.label} จะเช็ก` : `ช่วง ${group.label} ควรเช็ก`}
-      </p>
-      <ul className="mt-2 space-y-1">
-        {items.slice(0, 3).map((i) => (
-          <li key={i.id} className="flex items-start gap-2 text-sm">
-            <span className="mt-0.5 shrink-0 rounded-md bg-surface-muted px-1.5 text-xs font-semibold text-ink-muted">{i.domain}</span>
-            {i.skill}
-          </li>
-        ))}
-        {items.length > 3 && <li className="pl-9 text-sm text-ink-muted">และอีก {items.length - 3} ข้อ</li>}
-      </ul>
-
-      {quiz && (
-        <div className="mt-4">
-          {quiz.last && (
-            <p className="mb-2 text-sm text-ink-muted">
-              ครั้งล่าสุด {formatThaiDate(quiz.last.date, true)} ทำได้ {quiz.last.score}/{quiz.last.total} ข้อ
-              {quiz.reason === 'waiting' && quiz.last.retestDate && ` · ทำซ้ำ ${formatThaiDate(quiz.last.retestDate, true)}`}
-              {quiz.last.referral && ' · แนะนำปรึกษาคลินิกเด็กดี'}
+    <Tile to="/growth" title="น้ำหนัก" icon={ChartLineIcon}>
+      {latest ? (
+        <>
+          <p className="text-2xl font-bold tabular-nums text-ink">
+            {latest.weightKg} <span className="text-base font-semibold">กก.</span>
+          </p>
+          {latestWeight && (
+            <p className="text-xs text-ink-muted">
+              {formatPercentile(latestWeight.percentile)} ·{' '}
+              <span className={latestWeight.level === 'normal' ? 'text-success' : 'text-warning'}>
+                {latestWeight.level === 'normal' ? 'อยู่ในเกณฑ์' : latestWeight.level === 'low' ? 'น้อยกว่าเกณฑ์' : 'มากกว่าเกณฑ์'}
+              </span>
             </p>
           )}
-          {quiz.due ? (
-            <Link
-              to="/milestones"
-              className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-5 font-semibold text-on-primary transition-colors duration-150 hover:bg-primary-hover"
-            >
-              {quiz.reason === 'retest' ? 'ถึงวันทำซ้ำ — ทำควิซช่วงนี้' : 'ทำควิซช่วงนี้'}
-            </Link>
-          ) : (
-            quiz.reason === 'done' && (
-              <p className="flex items-center gap-2 text-sm text-ink">
-                <CheckCircleIcon size={18} className="text-success" aria-hidden="true" />
-                สมวัยทุกด้านในช่วงนี้
-              </p>
-            )
-          )}
-        </div>
+          <div className="mt-auto pt-2">
+            <Sparkline values={weights.map((w) => w.weightKg!)} />
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="text-2xl font-bold text-ink-muted">–</p>
+          <p className="mt-1 text-xs text-ink-muted">ยังไม่มีข้อมูล แตะเพื่อบันทึกน้ำหนัก</p>
+        </>
       )}
-    </section>
+    </Tile>
   )
 }
 
-function ChecklistCard({ child, today }: { child: Child; today: Date }) {
+/** ของที่ต้องเตรียม: วงแหวน % ของช่วงนี้ */
+function ChecklistTile({ child, today }: { child: Child; today: Date }) {
   const { current, next } = getRelevantStages(child, today)
   if (!current) return null
   // ช่วงนี้ครบแล้ว → ชวนเตรียมช่วงถัดไป
   const focus = current.percent === 100 && next ? next : current
-  const remaining = focus.items.filter((i) => !child.checklist[i.id])
 
   return (
-    <DashboardCard to="/checklist" title="ของที่ต้องเตรียม" icon={ListChecksIcon} linkLabel="ทั้งหมด">
-      <div className="flex items-baseline justify-between gap-2">
-        <p className="font-medium">
-          {focus === current ? 'ช่วงนี้' : 'ช่วงถัดไป'}: {focus.stage.title}
+    <Tile to="/checklist" title="เตรียมของ" icon={ListChecksIcon}>
+      <div className="flex flex-1 flex-col items-center text-center">
+        <Ring value={focus.percent} max={100} size={76} tone="primary">
+          <span className="text-lg font-bold tabular-nums text-ink">{focus.percent}%</span>
+        </Ring>
+        <p className="mt-2 text-xs text-ink-muted">
+          {focus === current ? 'ช่วงนี้' : 'ช่วงถัดไป'} · {focus.doneCount}/{focus.items.length} รายการ
         </p>
-        <p className="text-sm font-semibold tabular-nums text-primary-strong">{focus.percent}%</p>
       </div>
-      <div className="mt-2">
-        <ProgressBar value={focus.percent} label={`เตรียมของช่วง ${focus.stage.title} แล้ว ${focus.percent}%`} />
+    </Tile>
+  )
+}
+
+/** พัฒนาการ: วงแหวนจำนวนด้านที่สมวัย (5 ด้านตาม DSPM) */
+function DevelopmentTile({ child, today }: { child: Child; today: Date }) {
+  const quiz = getQuizStatus(child, today)
+  if (!quiz) return null
+  const score = quiz.last
+    ? scoreQuiz(quiz.last.answers, { items: getQuizForGroup(quiz.last.ageGroupId).items, date: toDay(quiz.last.date) })
+    : null
+  const count = (s: string) => score?.domains.filter((d) => d.status === s).length ?? 0
+  const onTrack = count('onTrack')
+
+  return (
+    <Tile to="/milestones" title={`พัฒนาการ ช่วง ${quiz.group.label}`} icon={PuzzlePieceIcon}>
+      <div className="flex items-center gap-4">
+        <Ring value={onTrack} max={DOMAIN_ORDER.length}>
+          <span>
+            <span className="block text-xl font-bold tabular-nums text-ink">
+              {score ? onTrack : '–'}/{DOMAIN_ORDER.length}
+            </span>
+            <span className="block text-xs text-ink-muted">{score ? 'ด้านสมวัย' : 'ด้าน'}</span>
+          </span>
+        </Ring>
+        {score ? (
+          <ul className="min-w-0 flex-1 space-y-1.5">
+            <StatRow icon={CheckCircleIcon} iconClass="text-success" label="สมวัย" value={onTrack} />
+            <StatRow icon={WarningCircleIcon} iconClass="text-warning" label="ควรส่งเสริม" value={count('promote')} />
+            <StatRow icon={QuestionIcon} iconClass="text-ink-muted" label="ยังไม่แน่ใจ" value={count('unsure')} />
+          </ul>
+        ) : (
+          <p className="min-w-0 flex-1 text-sm text-ink-muted">ยังไม่ได้ประเมินช่วงนี้ ใช้เวลาประมาณ 3 นาที</p>
+        )}
       </div>
-      {remaining.length > 0 ? (
-        <ul className="mt-3 space-y-1">
-          {remaining.slice(0, 3).map((i) => (
-            <li key={i.id} className="flex items-start gap-2 text-sm">
-              <ClipboardTextIcon size={16} className="mt-0.5 shrink-0 text-ink-muted" aria-hidden="true" />
-              {i.item}
-            </li>
-          ))}
-          {remaining.length > 3 && <li className="pl-6 text-sm text-ink-muted">และอีก {remaining.length - 3} รายการ</li>}
-        </ul>
-      ) : (
-        <p className="mt-3 text-sm text-ink-muted">เตรียมครบทุกรายการแล้ว</p>
+      {quiz.due && (
+        <span className="mt-3 flex min-h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-semibold text-on-primary transition-colors duration-150 group-hover:bg-primary-hover">
+          {quiz.reason === 'retest' ? 'ถึงวันทำซ้ำ — ทำควิซ' : 'ทำควิซช่วงนี้'}
+        </span>
       )}
-    </DashboardCard>
+    </Tile>
+  )
+}
+
+/** นัดฝากครรภ์: วงแหวนนัดที่ผ่านมาแล้ว + นับถอยหลังนัดถัดไป */
+function AntenatalTile({ dueDate, today }: { dueDate: string; today: Date }) {
+  const m = getPregnancyMilestones(dueDate, today)
+  const visits = m.items.filter((i) => i.kind === 'visit')
+  const past = visits.filter((v) => v.status === 'past').length
+  const next = getNextVisit(m)
+  const daysToNext = next ? Math.round((toDay(next.startDate).getTime() - toDay(today).getTime()) / 86_400_000) : null
+
+  return (
+    <Tile to="/antenatal" title="นัดฝากครรภ์" icon={StethoscopeIcon}>
+      <div className="flex items-center gap-4">
+        <Ring value={past} max={visits.length}>
+          <span>
+            <span className="block text-xl font-bold tabular-nums text-ink">
+              {past}/{visits.length}
+            </span>
+            <span className="block text-xs text-ink-muted">นัด</span>
+          </span>
+        </Ring>
+        <div className="min-w-0 flex-1">
+          {next ? (
+            <>
+              <p className="flex items-center gap-1 text-xs text-ink-muted">
+                <ClockIcon size={14} aria-hidden="true" />
+                {daysToNext !== null && daysToNext > 0 ? 'นัดถัดไปอีก' : 'นัดถัดไป'}
+              </p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
+                {daysToNext !== null && daysToNext > 0 ? (
+                  <>
+                    {daysToNext} <span className="text-base font-semibold">วัน</span>
+                  </>
+                ) : (
+                  'ถึงช่วงนัดแล้ว'
+                )}
+              </p>
+              <p className="text-sm leading-snug text-ink-muted">{next.title}</p>
+            </>
+          ) : (
+            <p className="text-sm font-medium">ครบทุกนัดแล้ว</p>
+          )}
+        </div>
+      </div>
+    </Tile>
+  )
+}
+
+/** ตรวจ/วัคซีนที่ควรทำในช่วงอายุครรภ์นี้ — ตัวเลขเดียว */
+function ChecksNowTile({ dueDate, today }: { dueDate: string; today: Date }) {
+  const m = getPregnancyMilestones(dueDate, today)
+  const now = m.items.filter((i) => i.status === 'current' && (i.kind === 'test' || i.kind === 'vaccine'))
+
+  return (
+    <Tile to="/antenatal" title="ตรวจช่วงนี้" icon={TestTubeIcon}>
+      <p className="text-3xl font-bold tabular-nums text-ink">
+        {now.length} <span className="text-base font-semibold">รายการ</span>
+      </p>
+      <p className="mt-1 line-clamp-2 text-xs leading-snug text-ink-muted">
+        {now.length > 0 ? now[0].title : 'ช่วงนี้ไม่มีการตรวจเฉพาะ'}
+      </p>
+      {now.length > 1 && <p className="text-xs text-ink-muted">และอีก {now.length - 1} รายการ</p>}
+    </Tile>
   )
 }
