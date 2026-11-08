@@ -15,6 +15,7 @@ import {
   ClockIcon,
   GenderFemaleIcon,
   GenderMaleIcon,
+  HourglassIcon,
   InfoIcon,
   ListChecksIcon,
   PencilSimpleIcon,
@@ -55,7 +56,7 @@ export default function HomePage() {
     <div className="space-y-3">
       <h1 className="sr-only">หน้าหลัก</h1>
       <StatusNotice status={status} />
-      <ProfileCard child={activeChild} />
+      <ProfileCard child={activeChild} status={status} />
       {status.mode === 'born' ? (
         <>
           <VaccineTile child={activeChild} today={today} />
@@ -105,8 +106,8 @@ function StatusNotice({ status }: { status: ChildStatus }) {
   )
 }
 
-/** ข้อมูลส่วนตัวของลูก (อายุแสดงที่แถบหัวแล้ว ไม่ซ้ำตรงนี้) — แตะเพื่อแก้ไขในหน้าตั้งค่า */
-function ProfileCard({ child }: { child: Child }) {
+/** ข้อมูลส่วนตัวของลูก + อายุ (หรืออายุครรภ์) — แตะเพื่อแก้ไขในหน้าตั้งค่า */
+function ProfileCard({ child, status }: { child: Child; status: ChildStatus }) {
   const born = child.mode === 'born'
   const date = born ? child.birthDate : child.dueDate
   const SexIcon = child.sex === 'girl' ? GenderFemaleIcon : child.sex === 'boy' ? GenderMaleIcon : QuestionIcon
@@ -122,7 +123,11 @@ function ProfileCard({ child }: { child: Child }) {
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-2xl font-bold leading-tight">{child.name}</p>
-          <p className="text-sm text-on-primary/85">{born ? 'คลอดแล้ว' : 'กำลังตั้งครรภ์'}</p>
+          <p className="font-semibold">
+            {status.mode === 'born'
+              ? `อายุ ${status.label}`
+              : `อายุครรภ์ ${status.pregnancy.weeks} สัปดาห์${status.pregnancy.days > 0 ? ` ${status.pregnancy.days} วัน` : ''}`}
+          </p>
         </div>
         <PencilSimpleIcon size={18} className="shrink-0 text-on-primary/80" aria-hidden="true" />
       </div>
@@ -137,6 +142,17 @@ function ProfileCard({ child }: { child: Child }) {
             {born && child.birthTime && <span className="block font-normal">เวลา {child.birthTime} น.</span>}
           </dd>
         </div>
+        {status.mode === 'pregnant' && (
+          <div>
+            <dt className="flex items-center gap-1 text-on-primary/80">
+              <HourglassIcon size={15} aria-hidden="true" />
+              {status.pregnancy.daysUntilDue >= 0 ? 'เหลืออีก' : 'เลยกำหนด'}
+            </dt>
+            <dd className="mt-0.5 font-semibold">
+              {status.pregnancy.daysUntilDue === 0 ? 'ครบกำหนดวันนี้' : `${Math.abs(status.pregnancy.daysUntilDue)} วัน`}
+            </dd>
+          </div>
+        )}
         <div>
           <dt className="flex items-center gap-1 text-on-primary/80">
             <SexIcon size={15} aria-hidden="true" />
