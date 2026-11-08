@@ -24,8 +24,8 @@ const NAV_ITEMS: { to: string; label: string; icon: Icon }[] = [
   { to: '/vaccine', label: 'วัคซีน', icon: SyringeIcon },
   { to: '/milestones', label: 'พัฒนาการ', icon: PuzzlePieceIcon },
   { to: '/growth', label: 'เติบโต', icon: ChartLineIcon },
-  { to: '/community', label: 'ชุมชน', icon: UsersThreeIcon },
-  { to: '/tools', label: 'เครื่องมือ', icon: ToolboxIcon },
+  { to: '/community', label: 'community', icon: UsersThreeIcon },
+  { to: '/tools', label: 'ผู้ช่วย', icon: ToolboxIcon },
 ]
 
 export function Layout() {

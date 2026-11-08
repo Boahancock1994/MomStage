@@ -33,7 +33,7 @@ export function BackToTools() {
       className="-ml-2 mb-2 inline-flex min-h-11 items-center gap-1 rounded-full px-2 font-medium text-primary-strong hover:bg-primary-soft"
     >
       <ArrowLeftIcon size={20} aria-hidden="true" />
-      เครื่องมือทั้งหมด
+      ผู้ช่วยทั้งหมด
     </Link>
   )
 }

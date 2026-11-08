@@ -88,7 +88,7 @@ export default function CommunityPage() {
   return (
     <>
       <PageHeader
-        title="ชุมชนคุณแม่"
+        title="Community คุณแม่"
         subtitle={userStage ? `ช่วงของคุณ: ${stageLabel(userStage.stage)} · แสดงโพสต์ช่วงเดียวกันก่อน` : 'แชร์ประสบการณ์กับคุณแม่ช่วงวัยเดียวกัน'}
       />
 

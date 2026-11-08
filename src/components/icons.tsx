@@ -8,6 +8,7 @@ import {
   Ban,
   Baby,
   BriefcaseMedical,
+  Cake,
   Calculator,
   CalendarCheck,
   ChartLine,
@@ -98,6 +99,7 @@ export const ArrowCounterClockwiseIcon = wrap(RotateCcw, 'ArrowCounterClockwiseI
 export const ArrowLeftIcon = wrap(ArrowLeft, 'ArrowLeftIcon')
 export const BabyCarriageIcon = wrap(HeartPulse, 'BabyCarriageIcon') // โหมดตั้งครรภ์
 export const BabyIcon = wrap(Baby, 'BabyIcon')
+export const CakeIcon = wrap(Cake, 'CakeIcon')
 export const CalculatorIcon = wrap(Calculator, 'CalculatorIcon')
 export const CalendarCheckIcon = wrap(CalendarCheck, 'CalendarCheckIcon')
 export const CaretDownIcon = wrap(ChevronDown, 'CaretDownIcon')

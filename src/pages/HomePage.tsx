@@ -4,28 +4,38 @@
  * ทุกตัวเลขมาจาก src/lib/* (หน้านี้ไม่คำนวณเอง)
  */
 import {
+  BabyCarriageIcon,
+  BabyIcon,
+  CakeIcon,
   CalendarCheckIcon,
   CaretRightIcon,
+  ChatCircleTextIcon,
   CheckCircleIcon,
   ChartLineIcon,
   ClockIcon,
+  GenderFemaleIcon,
+  GenderMaleIcon,
   InfoIcon,
   ListChecksIcon,
+  PencilSimpleIcon,
   PuzzlePieceIcon,
   QuestionIcon,
   StethoscopeIcon,
   SyringeIcon,
   TestTubeIcon,
+  UsersThreeIcon,
   WarningCircleIcon,
 } from '../components/icons'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Ring, Sparkline, StatRow, Tile } from '../components/DashboardWidgets'
-import { FULL_TERM_DAYS, MAX_CHILD_AGE_MONTHS } from '../data/constants'
+import { MAX_CHILD_AGE_MONTHS } from '../data/constants'
 import { DOMAIN_ORDER } from '../data/dspm'
 import { getRelevantStages } from '../lib/checklist'
 import { getChildStatus, type ChildStatus } from '../lib/childStatus'
-import { formatRelativeDays } from '../lib/format'
+import { formatRelativeDays, formatThaiDate } from '../lib/format'
 import { assessGrowth, formatPercentile } from '../lib/growth'
+import { getChildStage, postRepository, sortFeed, stageLabel, type Post } from '../lib/posts'
 import { getNextVisit, getPregnancyMilestones } from '../lib/pregnancy'
 import { getQuizForGroup, getQuizStatus, scoreQuiz } from '../lib/quiz'
 import { toDay } from '../lib/age'
@@ -45,7 +55,7 @@ export default function HomePage() {
     <div className="space-y-3">
       <h1 className="sr-only">หน้าหลัก</h1>
       <StatusNotice status={status} />
-      <AgeCard child={activeChild} status={status} />
+      <ProfileCard child={activeChild} />
       {status.mode === 'born' ? (
         <>
           <VaccineTile child={activeChild} today={today} />
@@ -64,6 +74,7 @@ export default function HomePage() {
           </div>
         </>
       )}
+      <CommunityTile child={activeChild} today={today} />
     </div>
   )
 }
@@ -94,48 +105,46 @@ function StatusNotice({ status }: { status: ChildStatus }) {
   )
 }
 
-function AgeCard({ child, status }: { child: Child; status: ChildStatus }) {
-  const to = status.mode === 'pregnant' ? '/antenatal' : '/growth'
+/** ข้อมูลส่วนตัวของลูก (อายุแสดงที่แถบหัวแล้ว ไม่ซ้ำตรงนี้) — แตะเพื่อแก้ไขในหน้าตั้งค่า */
+function ProfileCard({ child }: { child: Child }) {
+  const born = child.mode === 'born'
+  const date = born ? child.birthDate : child.dueDate
+  const SexIcon = child.sex === 'girl' ? GenderFemaleIcon : child.sex === 'boy' ? GenderMaleIcon : QuestionIcon
   return (
     <Link
-      to={to}
-      className="group block overflow-hidden rounded-[var(--radius-card)] bg-primary p-5 text-on-primary shadow-[var(--shadow-card)] transition-colors duration-150 hover:bg-primary-hover active:scale-[0.99]"
+      to="/settings"
+      aria-label={`ข้อมูลของ${child.name} แตะเพื่อแก้ไข`}
+      className="group block rounded-[var(--radius-card)] bg-primary p-5 text-on-primary shadow-[var(--shadow-card)] transition-colors duration-150 hover:bg-primary-hover active:scale-[0.99]"
     >
-      <p className="text-sm font-medium text-on-primary/85">{child.name}</p>
-      {status.mode === 'pregnant' ? (
-        <>
-          <p className="mt-1 text-[1.75rem] font-bold leading-tight">
-            ตั้งครรภ์สัปดาห์ที่ {status.pregnancy.weeks}
-            {status.pregnancy.days > 0 && <span className="text-lg font-semibold"> +{status.pregnancy.days} วัน</span>}
-          </p>
-          <p className="mt-1 text-on-primary/90">
-            ไตรมาส {status.pregnancy.trimester} ·{' '}
-            {status.pregnancy.daysUntilDue >= 0
-              ? `อีก ${status.pregnancy.daysUntilDue} วันคลอด`
-              : `เลยกำหนดคลอด ${-status.pregnancy.daysUntilDue} วัน`}
-          </p>
-          <div
-            className="mt-4 h-2 overflow-hidden rounded-full bg-on-primary/25"
-            role="progressbar"
-            aria-label="ความคืบหน้าของการตั้งครรภ์"
-            aria-valuenow={Math.round((status.pregnancy.totalDays / FULL_TERM_DAYS) * 100)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          >
-            <div
-              className="h-full rounded-full bg-accent-strong"
-              style={{ width: `${Math.min(100, (status.pregnancy.totalDays / FULL_TERM_DAYS) * 100)}%` }}
-            />
-          </div>
-        </>
-      ) : (
-        <>
-          <p className="mt-1 text-[1.75rem] font-bold leading-tight">อายุ {status.label}</p>
-          <p className="mt-1 text-on-primary/90">
-            วันที่ {(status.age.totalDays + 1).toLocaleString('th-TH')} ของชีวิต · {status.age.totalWeeks} สัปดาห์
-          </p>
-        </>
-      )}
+      <div className="flex items-center gap-3">
+        <span className="grid size-12 shrink-0 place-items-center rounded-full bg-on-primary/15">
+          {born ? <BabyIcon size={26} aria-hidden="true" /> : <BabyCarriageIcon size={26} aria-hidden="true" />}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-2xl font-bold leading-tight">{child.name}</p>
+          <p className="text-sm text-on-primary/85">{born ? 'คลอดแล้ว' : 'กำลังตั้งครรภ์'}</p>
+        </div>
+        <PencilSimpleIcon size={18} className="shrink-0 text-on-primary/80" aria-hidden="true" />
+      </div>
+      <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-on-primary/20 pt-4 text-sm">
+        <div>
+          <dt className="flex items-center gap-1 text-on-primary/80">
+            {born ? <CakeIcon size={15} aria-hidden="true" /> : <CalendarCheckIcon size={15} aria-hidden="true" />}
+            {born ? 'วันเกิด' : 'กำหนดคลอด'}
+          </dt>
+          <dd className="mt-0.5 font-semibold">
+            {date ? formatThaiDate(date) : '–'}
+            {born && child.birthTime && <span className="block font-normal">เวลา {child.birthTime} น.</span>}
+          </dd>
+        </div>
+        <div>
+          <dt className="flex items-center gap-1 text-on-primary/80">
+            <SexIcon size={15} aria-hidden="true" />
+            เพศ
+          </dt>
+          <dd className="mt-0.5 font-semibold">{child.sex === 'girl' ? 'หญิง' : child.sex === 'boy' ? 'ชาย' : 'ยังไม่ระบุ'}</dd>
+        </div>
+      </dl>
     </Link>
   )
 }
@@ -347,6 +356,47 @@ function ChecksNowTile({ dueDate, today }: { dueDate: string; today: Date }) {
         {now.length > 0 ? now[0].title : 'ช่วงนี้ไม่มีการตรวจเฉพาะ'}
       </p>
       {now.length > 1 && <p className="text-xs text-ink-muted">และอีก {now.length - 1} รายการ</p>}
+    </Tile>
+  )
+}
+
+/** community: จำนวนโพสต์ในช่วงวัยเดียวกัน + หัวข้อล่าสุด */
+function CommunityTile({ child, today }: { child: Child; today: Date }) {
+  const [posts, setPosts] = useState<Post[] | null>(null)
+  // repository เป็น async (เตรียมสลับไป Firestore)
+  useEffect(() => {
+    let cancelled = false
+    postRepository.list().then((list) => !cancelled && setPosts(list))
+    return () => {
+      cancelled = true
+    }
+  }, [])
+  const stage = getChildStage(child, today)?.stage ?? null
+  const same = sortFeed(posts ?? [], stage).filter((f) => f.group === 'same')
+
+  return (
+    <Tile to="/community" title="community" icon={UsersThreeIcon}>
+      <div className="flex items-center gap-4">
+        <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary-strong">
+          <ChatCircleTextIcon size={28} aria-hidden="true" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-2xl font-bold tabular-nums text-ink">
+            {posts ? same.length : '–'} <span className="text-base font-semibold">โพสต์</span>
+          </p>
+          <p className="text-xs text-ink-muted">{stage ? `จากคุณแม่ช่วง ${stageLabel(stage)}` : 'จากคุณแม่ช่วงเดียวกัน'}</p>
+        </div>
+      </div>
+      <p className="mt-3 truncate rounded-xl bg-surface-muted px-3 py-2 text-sm">
+        {same.length > 0 ? (
+          <>
+            <span className="text-ink-muted">ล่าสุด: </span>
+            <span className="font-medium">{same[0].post.title}</span>
+          </>
+        ) : (
+          <span className="text-ink-muted">ยังไม่มีโพสต์ในช่วงนี้ เริ่มแชร์เป็นคนแรก</span>
+        )}
+      </p>
     </Tile>
   )
 }
