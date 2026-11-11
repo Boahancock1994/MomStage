@@ -3,7 +3,9 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import AntenatalPage from './pages/AntenatalPage'
 import ChecklistPage from './pages/ChecklistPage'
+import AvoidProductsPage from './pages/AvoidProductsPage'
 import MomFoodPage from './pages/MomFoodPage'
+import MomMindPage from './pages/MomMindPage'
 import NamePage from './pages/NamePage'
 import SickPage from './pages/SickPage'
 import CommunityPage from './pages/CommunityPage'
@@ -43,6 +45,8 @@ export default function App() {
           <Route path="tools" element={<ToolsPage />} />
           <Route path="tools/sick" element={<SickPage />} />
           <Route path="tools/mom-food" element={<MomFoodPage />} />
+          <Route path="tools/mom-mind" element={<MomMindPage />} />
+          <Route path="tools/avoid" element={<AvoidProductsPage />} />
           <Route path="tools/name" element={<NamePage />} />
           <Route
             path="tools/nursing-map"

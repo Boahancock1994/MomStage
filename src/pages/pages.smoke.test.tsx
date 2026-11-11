@@ -5,7 +5,9 @@ import { Layout } from '../components/Layout'
 import AntenatalPage from './AntenatalPage'
 import ChecklistPage from './ChecklistPage'
 import CalcPage from './CalcPage'
+import AvoidProductsPage from './AvoidProductsPage'
 import MomFoodPage from './MomFoodPage'
+import MomMindPage from './MomMindPage'
 import GrowthPage from './GrowthPage'
 import SickPage from './SickPage'
 import ToolsPage from './ToolsPage'
@@ -32,6 +34,8 @@ function Dump({ path }: { path: string }) {
           <Route path="tools" element={<ToolsPage />} />
           <Route path="tools/sick" element={<SickPage />} />
           <Route path="tools/mom-food" element={<MomFoodPage />} />
+          <Route path="tools/mom-mind" element={<MomMindPage />} />
+          <Route path="tools/avoid" element={<AvoidProductsPage />} />
           <Route path="tools/calc" element={<CalcPage />} />
           <Route path="tools/name" element={<NamePage />} />
         </Route>
@@ -58,7 +62,7 @@ it('หน้าหลักทุกหน้า render ได้โดยไ�
   const store = grab()
   for (const child of store.children) {
     store.setActiveChild(child.id)
-    for (const p of ['/', '/vaccine', '/antenatal', '/checklist', '/milestones', '/milestones/history', '/growth', '/tools', '/tools/sick', '/tools/mom-food', '/tools/calc', '/tools/calc?tab=cost', '/tools/calc?tab=log', '/tools/name']) {
+    for (const p of ['/', '/vaccine', '/antenatal', '/checklist', '/milestones', '/milestones/history', '/growth', '/tools', '/tools/sick', '/tools/mom-food', '/tools/mom-mind', '/tools/avoid', '/tools/calc', '/tools/calc?tab=cost', '/tools/calc?tab=log', '/tools/name']) {
       const html = renderToString(<Dump path={p} />)
       expect(html.length).toBeGreaterThan(500)
     }

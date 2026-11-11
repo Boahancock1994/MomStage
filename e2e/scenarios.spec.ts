@@ -13,6 +13,8 @@ const ROUTES = [
   '/tools',
   '/tools/sick',
   '/tools/mom-food',
+  '/tools/mom-mind',
+  '/tools/avoid',
   '/tools/name',
   '/tools/nursing-map',
   '/tools/calc',
@@ -85,6 +87,23 @@ test('ลบลูกคนสุดท้าย → กลับไปหน้
   await expect(page).toHaveURL('/onboarding')
   await page.reload()
   await expect(page).toHaveURL('/onboarding')
+})
+
+test('แบบประเมินสุขภาพใจ: ตอบครบ 10 ข้อได้ผล และข้อ 10 แสดงสายด่วน', async ({ page }) => {
+  await seedDemo(page)
+  await page.goto('/tools/mom-mind')
+  await page.getByRole('button', { name: 'เริ่มทำแบบประเมิน' }).click()
+  // ตอบตัวเลือกสุดท้ายทุกข้อ: ข้อ 1, 2, 4 ได้ 3 คะแนน ข้ออื่นได้ 0 → 9 คะแนน ข้อ 10 = "ไม่เคยเลย"
+  for (let i = 0; i < 10; i++) await page.locator('fieldset label').last().click()
+  await expect(page.getByText('ความเสี่ยงต่ำ', { exact: true })).toBeVisible()
+  await expect(page.locator('main')).toContainText('9 / 30 คะแนน')
+  await expect(page.getByRole('alert')).toHaveCount(0)
+
+  await page.getByRole('button', { name: 'ทำแบบประเมินอีกครั้ง' }).click()
+  await page.getByRole('button', { name: 'เริ่มทำแบบประเมิน' }).click()
+  for (let i = 0; i < 9; i++) await page.locator('fieldset label').last().click()
+  await page.getByText('บางครั้ง', { exact: true }).click()
+  await expect(page.getByRole('alert')).toContainText('1323')
 })
 
 test('รีเฟรชแล้วข้อมูลยังอยู่', async ({ page }) => {

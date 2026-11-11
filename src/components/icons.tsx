@@ -81,6 +81,7 @@ import {
   Milk,
   GlassWater,
   Utensils,
+  ShieldAlert,
 } from 'lucide-react'
 import type { ComponentType } from 'react'
 
@@ -177,3 +178,4 @@ export const DrumstickIcon = wrap(Drumstick, 'DrumstickIcon')
 export const MilkIcon = wrap(Milk, 'MilkIcon')
 export const GlassWaterIcon = wrap(GlassWater, 'GlassWaterIcon')
 export const ForkKnifeIcon = wrap(Utensils, 'ForkKnifeIcon')
+export const ShieldWarningIcon = wrap(ShieldAlert, 'ShieldWarningIcon')

@@ -1,11 +1,13 @@
 /** ผู้ช่วย — รวมเครื่องมือช่วยคุณแม่ */
-import { CalculatorIcon, CaretRightIcon, FirstAidIcon, ForkKnifeIcon, MapPinIcon, SignatureIcon, type Icon } from '../components/icons'
+import { CalculatorIcon, CaretRightIcon, FirstAidIcon, ForkKnifeIcon, HeartIcon, ShieldWarningIcon, MapPinIcon, SignatureIcon, type Icon } from '../components/icons'
 import { Link } from 'react-router-dom'
 import { Badge, PageHeader } from '../components/ui'
 
 const TOOLS: { to?: string; title: string; desc: string; icon: Icon }[] = [
   { to: '/tools/sick', title: 'ลูกป่วย ควรไปหาหมอไหม', desc: 'ตอบคำถามทีละข้อ แอปบอกระดับความเร่งด่วนตามอายุลูก', icon: FirstAidIcon },
+  { to: '/tools/mom-mind', title: 'สุขภาพใจแม่หลังคลอด', desc: 'แบบประเมิน 10 ข้อ (EPDS) ดูว่าช่วงนี้เหนื่อยทั่วไป หรือควรได้รับการดูแลเพิ่ม', icon: HeartIcon },
   { to: '/tools/mom-food', title: 'กินแบบไหนลูกปลอดภัย', desc: 'กินอะไรดีช่วงตั้งครรภ์และหลังคลอด ประโยชน์ ปริมาณต่อวัน อาหารเสริม และสิ่งที่ควรเลี่ยง', icon: ForkKnifeIcon },
+  { to: '/tools/avoid', title: 'เครื่องสำอางและยาที่ควรเลี่ยง', desc: 'สารในสกินแคร์และยาที่ควรเลี่ยงช่วงตั้งครรภ์และให้นม พร้อมตัวเลือกที่ใช้แทนได้', icon: ShieldWarningIcon },
   { to: '/tools/calc', title: 'ลูกคนนี้ใช้เงินเท่าไหร่', desc: 'ปริมาณนมต่อมื้อ ค่าใช้จ่ายต่อเดือน และบันทึกการให้นม/การนอน', icon: CalculatorIcon },
   { to: '/tools/name', title: 'ตั้งชื่อลูกตามวันเกิด', desc: 'หาอักษรกาลกิณีตามวันเกิด (ทักษา) กรองชื่อพร้อมความหมาย และตรวจชื่อที่คิดไว้', icon: SignatureIcon },
   { to: '/tools/nursing-map', title: 'พิกัดห้องให้นม/เปลี่ยนผ้าอ้อม', desc: 'ห้องให้นมและมุมเปลี่ยนผ้าอ้อมใกล้คุณ ช่วยกันเพิ่มและยืนยัน', icon: MapPinIcon },
