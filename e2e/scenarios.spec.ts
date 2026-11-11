@@ -102,7 +102,7 @@ test('แบบประเมินสุขภาพใจ: ตอบครบ
   await page.getByRole('button', { name: 'ทำแบบประเมินอีกครั้ง' }).click()
   await page.getByRole('button', { name: 'เริ่มทำแบบประเมิน' }).click()
   for (let i = 0; i < 9; i++) await page.locator('fieldset label').last().click()
-  await page.getByText('บางครั้ง', { exact: true }).click()
+  await page.getByText('เป็นบางครั้ง', { exact: true }).click()
   await expect(page.getByRole('alert')).toContainText('1323')
 })
 

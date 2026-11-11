@@ -6,7 +6,7 @@ import { ArrowLeftIcon, ArrowCounterClockwiseIcon, CheckCircleIcon, HeartIcon, P
 import { useState } from 'react'
 import { BackToTools } from '../components/ToolSafety'
 import { Button, Card, PageHeader, ProgressBar } from '../components/ui'
-import { EPDS_MAX, EPDS_QUESTIONS, scoreEpds, type EpdsLevel } from '../lib/epds'
+import { EPDS_INSTRUCTION, EPDS_MAX, EPDS_QUESTIONS, scoreEpds, type EpdsLevel } from '../lib/epds'
 
 const LEVEL: Record<EpdsLevel, { title: string; text: string; box: string; icon: typeof CheckCircleIcon; iconClass: string }> = {
   low: {
@@ -54,8 +54,8 @@ export default function MomMindPage() {
             หลังคลอดคุณแม่หลายคนรู้สึกเศร้า เหนื่อย หรือกังวลมากกว่าปกติ แบบประเมินนี้ช่วยดูว่าความรู้สึกช่วงนี้เป็นอาการเหนื่อยทั่วไป
             หรือควรได้รับการดูแลเพิ่ม
           </p>
+          <p className="mt-3 rounded-2xl bg-surface-muted p-4 text-ink">{EPDS_INSTRUCTION}</p>
           <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-ink-muted">
-            <li>ตอบตามความรู้สึกใน <strong className="text-ink">7 วันที่ผ่านมา</strong> ไม่ใช่แค่วันนี้</li>
             <li>ไม่มีคำตอบถูกหรือผิด แอปไม่บันทึกคำตอบไว้</li>
             <li>ใช้ได้ทั้งช่วงตั้งครรภ์และหลังคลอดถึง 1 ปี</li>
           </ul>
@@ -81,7 +81,8 @@ export default function MomMindPage() {
       {done && <Result answers={answers} onRestart={restart} />}
 
       <p className="mt-6 text-xs text-ink-muted">
-        อ้างอิง: Edinburgh Postnatal Depression Scale (Cox, Holden & Sagovsky, 1987) ข้อความภาษาไทยเรียบเรียงตามความหมายของต้นฉบับ
+        © 1987 The Royal College of Psychiatrists. Cox, J.L., Holden, J.M., & Sagovsky, R. (1987). Detection of postnatal depression.
+        British Journal of Psychiatry, 150, 782–786. ข้อความภาษาไทยจากแบบฟอร์ม EPDS ฉบับภาษาไทยของ NSW Health ·
         เป็นแบบคัดกรอง ไม่ใช่การวินิจฉัย
       </p>
     </>
